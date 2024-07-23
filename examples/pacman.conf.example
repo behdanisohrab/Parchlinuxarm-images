@@ -73,7 +73,7 @@ Server = https://raw.githubusercontent.com/parchlinux-arm/ppr/main/aarch64/
 SigLevel = Never
 
 [archsink]
-Server = https://github.com/archsink/\$arch/releases/latest/download
+Server = https://github.com/archsink/$arch/releases/latest/download
 SigLevel = Never
 
 [danctnix]
