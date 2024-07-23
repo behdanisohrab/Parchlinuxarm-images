@@ -1,0 +1,76 @@
+#!/bin/bash
+
+set -uo pipefail
+
+# Configure system locale to en_US.UTF-8
+sed -i 's/#\(en_US.UTF-8 UTF-8\)/\1/g' /etc/locale.gen
+locale-gen
+echo 'LANG=en_US.UTF-8' > /etc/locale.conf
+
+# Add archsink repo
+cat <<EOF >> /etc/pacman.conf
+
+[archsink]
+Server = https://github.com/archsink/\$arch/releases/latest/download
+SigLevel = Never
+
+[ppr]
+Server = https://raw.githubusercontent.com/parchlinux-arm/ppr/main/aarch64/
+SigLevel = Never
+
+EOF
+
+# Enable parallel downloads
+sed -i 's/#\(ParallelDownloads \)/\1/g' /etc/pacman.conf
+
+# Install useful packages
+packages=(
+  xfce4
+  xfce4-goodies
+  sddm
+  parch-branding
+  noto-fonts
+  vazirmatn-fonts
+  ttf-dejavu
+  parch-emoji-ios
+  arch-install-scripts
+  avahi
+  curl
+  git
+  htop
+  btop
+  iwd
+  man-db
+  neovim
+  pacman-contrib
+  yay-bin
+  python
+  rsync
+  sudo
+  tmux
+  tree
+  neofetch-git
+  networkmanager
+  network-manager-applet
+  zsh
+  vim
+  pipewire
+  pipewire-pulse
+  bluez
+  bluez-utils
+  blueman
+  pipewire-alsa
+  wireplumber
+)
+pacman -Syu --noconfirm --needed "${packages[@]}"
+
+# Enable services
+systemctl enable avahi-daemon NetworkManager
+systemctl enable sddm
+systemctl enable bluetooth
+
+# Prepare system for containers (e.g. for use with K3s)
+# https://github.com/k3s-io/k3s/issues/2067#issuecomment-664048424
+#if ! grep -q cgroup /boot/cmdline.txt; then
+#  sed -i '$ s/$/ cgroup_memory=1 cgroup_enable=memory/g' /boot/cmdline.txt
+#fi
