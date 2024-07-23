@@ -65,7 +65,7 @@ jobs:
     - name: Compress image
       run: | 
           mkdir image_parts
-          zip -r "image_parts/${{ steps.rename-image.outputs.image_name }}.zip" "${{ steps.rename-image.outputs.image_name }}"
+          zip -s 2000m "image_parts/${{ steps.rename-image.outputs.image_name }}.zip" "${{ steps.rename-image.outputs.image_name }}"
     - name: Upload image
       run: |
            sha256sum image_parts/* > image_parts/sha256sums.${{ matrix.arch }}.${{ matrix.flavor }}.txt
