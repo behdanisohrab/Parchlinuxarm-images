@@ -7,18 +7,18 @@ sed -i 's/#\(en_US.UTF-8 UTF-8\)/\1/g' /etc/locale.gen
 locale-gen
 echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 
+
+# Fix Pacman.conf
+rm -f /etc/pacman.conf
+curl https://raw.githubusercontent.com/parchlinux-ports/Parchlinuxarm-images/main/examples/pacman.conf.example >> /etc/pacman.conf
+
+# Enable Sudo
+sudo sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
 pacman-key --recv-keys 0x8685AD8B
 
 # Add archsink repo
 cat <<EOF >> /etc/pacman.conf
-
-[archsink]
-Server = https://github.com/archsink/\$arch/releases/latest/download
-SigLevel = Never
-
-[ppr]
-Server = https://raw.githubusercontent.com/parchlinux-arm/ppr/main/aarch64/
-SigLevel = Never
 
 [trinity]
 Server = https://mirror.ppa.trinitydesktop.org/trinity/archlinux/\$arch

@@ -7,21 +7,12 @@ sed -i 's/#\(en_US.UTF-8 UTF-8\)/\1/g' /etc/locale.gen
 locale-gen
 echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 
-# Add archsink repo
-cat <<EOF >> /etc/pacman.conf
+# Fix Pacman.conf
+rm -f /etc/pacman.conf
+curl https://raw.githubusercontent.com/parchlinux-ports/Parchlinuxarm-images/main/examples/pacman.conf.example >> /etc/pacman.conf
 
-[archsink]
-Server = https://github.com/archsink/\$arch/releases/latest/download
-SigLevel = Never
-
-[ppr]
-Server = https://raw.githubusercontent.com/parchlinux-arm/ppr/main/aarch64/
-SigLevel = Never
-
-EOF
-
-# Enable parallel downloads
-sed -i 's/#\(ParallelDownloads \)/\1/g' /etc/pacman.conf
+# Enable Sudo
+sudo sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
 # Install useful packages
 packages=(
