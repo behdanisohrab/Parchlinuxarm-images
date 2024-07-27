@@ -17,7 +17,7 @@ rm -rf /etc/hostname
 curl https://raw.githubusercontent.com/parchlinux-ports/Parchlinuxarm-images/main/examples/hostname.example >> /etc/hostname
 
 # Enable Sudo
-sudo sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
 # Install Desktop and Apps
 packages=(
