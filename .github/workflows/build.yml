@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: ['aarch64', 'rpi-aarch64', 'rpi5-aarch64']
+        arch: ['aarch64', 'rpi-aarch64']
         flavor: ['barebone']
         include:
         - arch: rpi-aarch64
@@ -29,8 +29,6 @@ jobs:
           flavor: xfce
         - arch: rpi-aarch64
           flavor: trinity
-        - arch: rpi5-aarch64
-          flavor: plasma
 
 
         
