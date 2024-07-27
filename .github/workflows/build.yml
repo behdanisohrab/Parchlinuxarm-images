@@ -12,7 +12,7 @@ env:
   name: ${{ github.event.repository.name }}
   release_name: ${{ github.ref_name }}
   GH_TOKEN: ${{ github.token }}
-  
+
 jobs:
   build:
     permissions:
@@ -20,53 +20,53 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: ['aarch64', 'rpi-aarch64']
-        flavor: ['barebone']
+        arch: ["aarch64", "rpi-aarch64"]
+        flavor: ["barebone"]
         include:
-        - arch: rpi-aarch64
-          flavor: plasma
-        - arch: rpi-aarch64
-          flavor: xfce
-        - arch: rpi-aarch64
-          flavor: trinity
+          - arch: rpi-aarch64
+            flavor: plasma
+          - arch: rpi-aarch64
+            flavor: xfce
+          - arch: rpi-aarch64
+            flavor: trinity
+          - arch: rpi-aarch64
+            flavor: gnome
 
-
-        
     steps:
-    - uses: actions/checkout@v3
-    - name: Configure Git user
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y parted wget dosfstools zip arch-install-scripts aria2 gh git
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-      with:
-        platforms: arm,arm64
-    - name: Build image
-      shell: bash
-      run: |
-        scripts=()
-        for script_name in "${{ matrix.arch }}" "${{ matrix.flavor }}" "${{ matrix.arch }}-${{ matrix.flavor }}"; do
-          script_path="setup/$script_name"
-          if [ -f "$script_path" ]; then
-            scripts+=("$script_path")
-          fi
-        done
-        sudo ./create-image 9G ${{ matrix.arch }} "${scripts[@]}"
-    - name: Rename image
-      id: rename-image
-      run: |
-        image_in_name="archlinux-${{ matrix.arch }}.img"
-        image_out_name="Parchlinux-${{ matrix.arch }}-${{ matrix.flavor }}-$(date '+%Y-%m-%d').img"
-        mv "$image_in_name" "$image_out_name"
-        echo "image_name=$image_out_name" >> "$GITHUB_OUTPUT"
-    - name: Compress image
-      run: | 
+      - uses: actions/checkout@v3
+      - name: Configure Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y parted wget dosfstools zip arch-install-scripts aria2 gh git
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm,arm64
+      - name: Build image
+        shell: bash
+        run: |
+          scripts=()
+          for script_name in "${{ matrix.arch }}" "${{ matrix.flavor }}" "${{ matrix.arch }}-${{ matrix.flavor }}"; do
+            script_path="setup/$script_name"
+            if [ -f "$script_path" ]; then
+              scripts+=("$script_path")
+            fi
+          done
+          sudo ./create-image 9G ${{ matrix.arch }} "${scripts[@]}"
+      - name: Rename image
+        id: rename-image
+        run: |
+          image_in_name="archlinux-${{ matrix.arch }}.img"
+          image_out_name="Parchlinux-${{ matrix.arch }}-${{ matrix.flavor }}-$(date '+%Y-%m-%d').img"
+          mv "$image_in_name" "$image_out_name"
+          echo "image_name=$image_out_name" >> "$GITHUB_OUTPUT"
+      - name: Compress image
+        run: |
           mkdir image_parts
           zip -s 2000m "image_parts/${{ steps.rename-image.outputs.image_name }}.zip" "${{ steps.rename-image.outputs.image_name }}"
-    - name: Upload image
-      run: |
-           sha256sum image_parts/* > image_parts/sha256sums.${{ matrix.arch }}.${{ matrix.flavor }}.txt
-           gh release upload ${{ github.event.release.tag_name }} ./image_parts/* -R ${{ github.repository }}
+      - name: Upload image
+        run: |
+          sha256sum image_parts/* > image_parts/sha256sums.${{ matrix.arch }}.${{ matrix.flavor }}.txt
+          gh release upload ${{ github.event.release.tag_name }} ./image_parts/* -R ${{ github.repository }}

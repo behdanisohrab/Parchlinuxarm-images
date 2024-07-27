@@ -1,0 +1,90 @@
+#!/bin/bash
+
+set -uo pipefail
+
+# Configure system locale to en_US.UTF-8
+sed -i 's/#\(en_US.UTF-8 UTF-8\)/\1/g' /etc/locale.gen
+sed -i 's/#\(fa_IR UTF-8\)/\1/g' /etc/locale.gen
+locale-gen
+echo 'LANG=en_US.UTF-8' > /etc/locale.conf
+
+# Fix Pacman.conf
+rm -f /etc/pacman.conf
+curl https://raw.githubusercontent.com/parchlinux-ports/Parchlinuxarm-images/main/examples/pacman.conf.example >> /etc/pacman.conf
+
+# Change hostname
+rm -rf /etc/hostname
+curl https://raw.githubusercontent.com/parchlinux-ports/Parchlinuxarm-images/main/examples/hostname.example >> /etc/hostname
+
+# Enable Sudo
+sudo sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
+# Install Desktop and Apps
+packages=(
+  parch-gnome-meta
+  gnome-usage
+  rpi-xorg-config
+  gnome-parch
+  parch-zram
+  gdm
+  parch-branding
+  noto-fonts
+  vazirmatn-fonts
+  parch-emoji-ios
+  arch-install-scripts
+  avahi
+  curl
+  git
+  btop
+  man-db
+  neovim
+  pacman-contrib
+  yay-bin
+  python
+  rsync
+  sudo
+  tree
+  fastfetch
+  neofetch-git
+  networkmanager
+  zsh
+  vim
+  pipewire
+  pipewire-pulse
+  bluez
+  bluez-utils
+  pipewire-alsa
+  wireplumber
+)
+pacman -Syu --noconfirm --needed "${packages[@]}"
+
+# Enable services
+systemctl enable avahi-daemon NetworkManager
+systemctl enable sddm
+systemctl enable bluetooth
+systemctl enable parch-zram
+systemctl enable gdm
+
+#remove alarm user
+userdel alarm
+
+# Hide Other Desktop Icons
+sed -i -e '$aHidden=true' /usr/share/applications/bvnc.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/bssh.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/avahi-discover.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/qv4l2.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/qvidcap.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/gda-browser-5.0.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/gda-control-center-5.0.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/plank.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/vim.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/htop.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/btop.desktop
+sed -i -e '$aHidden=true' /usr/share/applications/nvim.desktop
+
+
+# Prepare system for containers (e.g. for use with K3s)
+# https://github.com/k3s-io/k3s/issues/2067#issuecomment-664048424
+#if ! grep -q cgroup /boot/cmdline.txt; then
+#  sed -i '$ s/$/ cgroup_memory=1 cgroup_enable=memory/g' /boot/cmdline.txt
+#fi
