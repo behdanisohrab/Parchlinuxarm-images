@@ -22,6 +22,7 @@ sudo sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoe
 # Install Desktop and Apps
 packages=(
   parch-gnome-meta
+  gnome-initial-setup
   gnome-usage
   rpi-xorg-config
   gnome-parch
