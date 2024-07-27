@@ -16,8 +16,7 @@ curl https://raw.githubusercontent.com/parchlinux-ports/Parchlinuxarm-images/mai
 rm -rf /etc/hostname
 curl https://raw.githubusercontent.com/parchlinux-ports/Parchlinuxarm-images/main/examples/hostname.example >> /etc/hostname
 
-# Enable Sudo
-sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
 
 # Install Desktop and Apps
 packages=(
@@ -66,7 +65,7 @@ systemctl enable bluetooth
 systemctl enable parch-zram
 systemctl enable gdm
 
-#remove alarm user
+#remove alarm user for gnome initial setup
 userdel alarm
 
 # Hide Other Desktop Icons
@@ -83,6 +82,8 @@ sed -i -e '$aHidden=true' /usr/share/applications/htop.desktop
 sed -i -e '$aHidden=true' /usr/share/applications/btop.desktop
 sed -i -e '$aHidden=true' /usr/share/applications/nvim.desktop
 
+# Enable Sudo
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
 # Prepare system for containers (e.g. for use with K3s)
 # https://github.com/k3s-io/k3s/issues/2067#issuecomment-664048424
