@@ -95,7 +95,7 @@ packages=(
   man-db
   neovim
   pacman-contrib
-  yay-bin
+  paru
   python
   rsync
   sudo
